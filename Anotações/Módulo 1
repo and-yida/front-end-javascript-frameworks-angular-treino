@@ -1,0 +1,33 @@
+INTRODUÇÃO AO ANGULAR
+
+Angular é um framework JavaScript. Com Angular Material, podemos construir a interface de usuário, de forma similar ao que fizemos com Bootstrap 4 - ambas são UI frameworks. Os layouts podem ser construídos utilizando Angular Flex-Layout.
+
+Utilizar JavaScript envolve um nível de complexidade em manipular o DOM e manipular atualizações de dados manualmente. É a partir daí que entram os frameworks como o Angular.
+
+Uma bibliteca de software é uma coleção de implementações de comportamentos com uma interface bem definida pela qual o comportamento é invocado.
+O comportamento é fornecido para reutilização por vários programas independentes. Um programa invoca o comportamento fornecido pela biblioteca por meio de um mecanismo da linguagem.
+Por outro lado, um framework é uma abstração na qual o software fornece funcionalidades genéricas que podem ser seletivamente alteradas por código adicional escrito pelo usuário (possibilidade de customização).
+As bibliotecas fornecem funções de maneira que seu código está inteiramente a cargo de invocá-las e fazer uso delas onde parecer apropriado. Os frameworks fornecem implementações preenchidas pelo seu código para os detalhes. O framework está à frente de como as aplicações funcionam, e requisita o código do usuário como ajuda para que a tarefa seja feita.
+
+Como HTML faz apenas documentos estáticos, um framework como Angular supre a lacuna em relação a fornecer aplicações web dinâmicas e baseadas em dados. Além disso, Angular possui uma abordagem declarativa, e abordagem baseada em componentes.
+
+SET UP
+
+Criar uma aplicação Angular: ng new
+Adicionamos "--style=scss" ao final para usar SASS para estilizar.
+Criar os node modules na aplicação: npm install
+Criar o Live server: ng serve --open
+Ao criarmos uma aplicação, o Git já é inicializado no projeto e é criado um primeiro commit "initial commit".
+
+ARQUITETURA
+
+Arquitetura do Angular é baseada em módulos, baseada em componentes com templates, e faz uso de services.
+O módulo principal, root module ou app.module, recebe a contribuição de outros módulos, formando uma hierarquia.
+A inicialização da aplicação toma como base o root module como parâmetro.
+Cada module utiliza de components e services que devem ser importados.
+
+Observando o arquivo app.module.ts , temos a importação de alguns modules, a exportação de "AppModule" como classe, e um decorator - @NgModule -, uma função que modifica classes JS.
+Nos metadados do NgModule, temos bootstrap setado como [AppComponent], o que indica que a inicialização do AppModule depende na inicialização do AppComponent, o componente principal da aplicação.
+Imports especifica os modules que precisam ser importados para prover o AppModule. Os modules são importados de fato através das funções de import aí presentes: import { Module } from '@angular/...' 
+Declarations especifica um conjunto de components, directives e pipes que pertencem ao module.
+Providers especifica os services utilizados nesse module.
