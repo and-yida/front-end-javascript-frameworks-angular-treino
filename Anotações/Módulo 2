@@ -1,0 +1,50 @@
+DATA BINDING
+
+Como a maioria dos sites hoje em dia não é estática, os dados são fornecidos por um servidor backend. Os dados são utilizados para exibir dinamicamente conteúdo ou atualizar conteúdo no site.
+O template viabiliza o meio de comunicação com o DOM. Os dados fluem do backend para a aplicação web até o DOM. O template requer dados para ser disponibilizado através do componente. Além disso, os eventos de interação do usuário com o DOM são enviados de volta à aplicação.
+Já vimos exemplo de como o Angular nos dá suporte nessa questão, permitindo o uso de propriedades dos componentes no template.
+Chama-se data binding o mecanismo de coordenação do fluxo de informação entre o template e o DOM, ou, no caso do Angular, podemos dizer entre o componente e a propriedade no DOM.
+Na perspectiva do componente, uma propriedade ou método é disponibilizado ao template ou é invocado a partir do DOM. Na perspectiva do template, há informações que precisam ser renderizadas no DOM ou serem tomadas do DOM e enviadas de volta ao componente.
+Quatro formas de data binding com Angular:
+    {{ value }} : um valor do componente é utilizado no template;
+    [property] = "value" : uma propriedade associada a uma tag [], passada como valor para uma propriedade do componente;
+    (event)="handler" : evento gerado no DOM gera uma chamada para um manipulador ou método do componente;
+    [(ngModel)]="property" : qualquer mudança no DOM será refletida na propriedade do componente, e qualquer mudança na propriedade vai ser refletida no DOM.
+Binding targets são propriedades declaradas à esquerda da declaração, enquanto binding sources são declaradas à direita.
+Definir propriedades de targets associados a selectors de componente é uma forma de passar informação a um componente, ou enviar informação de um componente a outro. Utilizamos input e output decorators. Ex.: @Input() nome: Nome; @Output() event = new EventEmitter<Nome>();
+
+Neste projeto, implementamos a funcionalidade do usuário poder clicar no prato e poder ver informações sobre ele.
+
+Existe uma classe dish na qual introduzimos a classe dos objetos "dish" (os pratos), com seus parâmetros: preço, comentário, descrição, etc. Essa classe centralizará todas as chamadas à classe.
+Criamos um outra classe dishes para passar os valores de cada objeto dish, organizados sob a forma de array.
+    export const DISHES: Dish[] = [
+    {
+        id: '0',
+        ...
+        }
+    {
+        id: '1',
+        ...
+    }
+    
+A propriedade input está ligada a uma propriedade DOM no template. Atualiza o template com o valor da propriedade no DOM.
+Usando Input para compartilhar dados entre componentes: no componente dishdetail, entramos com a propriedade dish que recebe os objetos de Dish.
+    @Input() dish: Dish;
+    // o item dish advém da classe Dish, importada do arquivo dish.ts
+No componente menu, a propriedade "dishes" recebe o valor de cada objeto dentro da classe Dish, e cujos valores foram passados na classe DISHES.
+    dishes: Dish[] = DISHES;
+
+No template do componente menu, para permitir que o click no objeto prato desencadeie um evento, utilizamos no grid de pratos o handler:
+    <mat-grid-tile *ngFor="let dish of dishes" (click)="onSelect(dish)">
+    //onSelect(dish) define o evento relativo a quando um item (dish) é clicado
+O template no componente dishdetail vêm logo abaixo do grid:
+    <app-dishdetail [dish] = "selectedDish"></app-dishdetail>
+    //o parâmetro passado dentro do selector diz que a propriedade [dish] é passado como valor da propriedade no componente "selectedDish"
+Para garantir a relação entre o objeto clicado e suas informações a serem exibidas, incluímos no componente menu:
+    selectedDish!: Dish;
+    ...
+    onSelect(dish: Dish) {
+    this.selectedDish = dish;
+  }
+
+    //selectedDish vai receber o valor do atual dish clicado
