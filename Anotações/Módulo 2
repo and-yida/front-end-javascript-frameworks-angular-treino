@@ -102,3 +102,29 @@ A DI envolve quatro funções:
     interface: sobre como fazer uso do service;
     injector: a entidade responsável por injetar o objeto.
 Com Angular, podemos escrever a lógica no objeto independente e simplesmente injetá-lo onde for necessário. O subsistema de injeção do Angular é responsável por tornar possível todas as operações envolvidas.
+
+
+FUNDAMENTOS DO SERVICE
+
+Criar um service com o Angular CLI: ng generate service pasta/nomedoservice
+O arquivo ts do service conta com um decorator @Injetable , o que indica que esse objeto pode ser injetável em outros locais.
+Colocamos o import dos objetos dos quais queremos receber informação.
+
+Em nosso projeto, criamos um service "dish", e nele um método para pegar o array de objetos da classe Dish, e retornar a constante DISHES.
+    getDishes(): Dish[] {
+        return DISHES;
+    }
+No app.module.ts, importamos o service.
+    import { DishService } from './services/dish.service';
+E para fazê-lo disponível a toda a aplicação, declaramos também em providers.
+    providers: [DishService],
+Onde haviámos importado os objetos diretamente (import da classe DISHES), substituimos pela importação do service. A ideia, portanto, é delegar a tarefa de buscar informação para o service.
+Para acessar as informações do objeto, criamos um construtor. A injeção de dependência é declara aqui.
+O construtor especifica um tipo e armazena uma instância da classe (do service) em um campo privado.
+    constructor(private dishService: DishService) { }
+ngOnInit é um método no componente chamado após todas as propriedades vinculadas a dados forem inicializadas.
+Aqui vamos alinhar: a variável local dishes e o método getDishes do service.
+    ngOnInit() {
+        this.dishes = this.dishService.getDishes();
+    }
+    //o objeto dishes vai ser abastecido através do método getDishes, e colocado na variável local
