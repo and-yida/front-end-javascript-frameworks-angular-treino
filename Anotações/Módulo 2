@@ -48,3 +48,83 @@ Para garantir a relação entre o objeto clicado e suas informações a serem ex
   }
 
     //selectedDish vai receber o valor do atual dish clicado
+
+
+MODEL VIEW CONTROLLER FRAMEWORK
+
+MVC e MVVM frameworks
+Design patterns são padrões de projetos que referem-se a soluções bem documentadas para problemas recorrentes. Soluções para problemas recorrentes resolvidos por meio de software são os chamados software design patterns.
+Um dos padrões de engenharia de software, um padrão de arquitetura - software engineering architecture pattern -, prescreve isolar o domínio lógico da interface do usuário. Há uma separação entre: view, model e controller. Isso permite desenvolvimento, teste e manutenção independentes.
+Uma aplicação pode ser separada em três partes: model, view e controller.
+
+MVC (Model-View-Controller)
+Uma abordagem baseada em MVC consiste na seguinte divisão entre model, view e controller.
+Model:
+    gerencia o comportamento dos dados da aplicação;
+    responde a requisições sobre o estado de informações;
+    responde a instruções para mudar os estados;
+    em sistemas controlados por eventos, o model notifica o view quando uma informação é alterada.
+View:
+    renderiza o model para uma forma passível de interação (elemento de interface);
+    múltiplas views podem existir para um mesmo model, isto é, diferentes maneiras de apresentar a informação para o usuário;
+    a janela de exibição possui correspondência com o tamanho do display;
+Controller:
+    recebe entradas do usuário e inicia chamadas aos objetos do model;
+    instrui o model e a janela de exibição sobre ações baseadas na entrada a serem tomadas;
+
+MVVM (Model View View-Model)
+Na abordagem MVVM, o model representa a lógica e os dados; o view-model deriva do model e compreende a parte da informação necessária à renderização de uma view; view-model e view representam a apresentação e a lógica de apresentação.
+View model é uma abstração da view, compreendendo as propriedades públicas e os comandos disponíveis, e dispõe declarative data binding (ligação de dados declarativa).
+A forma como o Angular implementa os componentes e os templates pode ser vista como um modelo de abordagem MVVM.
+
+
+SERVICES
+
+Quando criamos um componente no Angular, convém deixarmos as classes de componente o mais exuto possível. O componente deve concentrar a tarefa de agir como um mediador entre a exibição (view) e a lógica (business logic) - ou, entre a view e o model, em outras palavras.
+Tarefas como buscar dados, validar entradas do usuário e informações de logging devem ser delegadas ao service. O service, portanto, é uma funcionalidade que provê esse tipo de recurso para que as classes de componente executem seu próprio trabalho. Ao service cabe, portanto, boa parte da lógica da aplicação.
+No Angular, temos a seguinte relação entre componente e template. O template atua renderizando a exibição (view) do componente, e o componente administra as propriedades e métodos que vão ser acessados pelo template para exibir a informação.
+O service, por sua vez, atua no componente, sendo injetado neste para suprimento de alguns recursos de que necessita o componente.
+Os services estão relacionadas à: injeção de dependência, promessas e JavaScript reativo.
+
+
+DEPENDENCY INJECTION
+
+Injeção de dependência é um padrão de projeto para resolver questões de dependência. É útil quando há objetos que dependem de outros objetos.
+Dependência é quando um objeto depende de outro objeto. Injeção consiste em passar uma dependência para um objeto dependente, o que o permite utilizar-se do que necessita. O objeto dependente não precisa lidar com como o primeiro objeto é implementado ou criado.
+Há três formas de um objeto acessar o outro:
+    criar o objeto dependente utilizando novo operador;
+    declarar o objeto dependente como variável global, e rastrear a dependência utilizando essa variável;
+    passar a dependência onde ela é necessária, sendo ela injetada para nós.
+A terceira opção, da dependência, é mais flexível e precisa de menos código.
+A DI envolve quatro funções:
+    service: do qual nós fazemos uso;
+    client: aquilo que é dependente, como o caso do componente;
+    interface: sobre como fazer uso do service;
+    injector: a entidade responsável por injetar o objeto.
+Com Angular, podemos escrever a lógica no objeto independente e simplesmente injetá-lo onde for necessário. O subsistema de injeção do Angular é responsável por tornar possível todas as operações envolvidas.
+
+
+FUNDAMENTOS DO SERVICE
+
+Criar um service com o Angular CLI: ng generate service pasta/nomedoservice
+O arquivo ts do service conta com um decorator @Injetable , o que indica que esse objeto pode ser injetável em outros locais.
+Colocamos o import dos objetos dos quais queremos receber informação.
+
+Em nosso projeto, criamos um service "dish", e nele um método para pegar o array de objetos da classe Dish, e retornar a constante DISHES.
+    getDishes(): Dish[] {
+        return DISHES;
+    }
+No app.module.ts, importamos o service.
+    import { DishService } from './services/dish.service';
+E para fazê-lo disponível a toda a aplicação, declaramos também em providers.
+    providers: [DishService],
+Onde haviámos importado os objetos diretamente (import da classe DISHES), substituimos pela importação do service. A ideia, portanto, é delegar a tarefa de buscar informação para o service.
+Para acessar as informações do objeto, criamos um construtor. A injeção de dependência é declara aqui.
+O construtor especifica um tipo e armazena uma instância da classe (do service) em um campo privado.
+    constructor(private dishService: DishService) { }
+ngOnInit é um método no componente chamado após todas as propriedades vinculadas a dados forem inicializadas.
+Aqui vamos alinhar: a variável local dishes e o método getDishes do service.
+    ngOnInit() {
+        this.dishes = this.dishService.getDishes();
+    }
+    //o objeto dishes vai ser abastecido através do método getDishes, e colocado na variável local
