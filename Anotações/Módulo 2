@@ -128,3 +128,29 @@ Aqui vamos alinhar: a variável local dishes e o método getDishes do service.
         this.dishes = this.dishService.getDishes();
     }
     //o objeto dishes vai ser abastecido através do método getDishes, e colocado na variável local
+
+
+HEADER AND FOOTER
+
+Criar o header e o footer na página:
+    ng generate component header
+    ng generate component footer
+
+    fxLayout="row wrap"
+    fxLayout.lt-md="comlumn"
+    //telas menores que médio (less than medium), exibe como coluna
+
+    fxLayoutGap="10px"
+    //vão entre itens filhos
+
+    <div fxFlex="55">
+    //ocupa 55% do tamanho
+
+
+ROUTING
+
+Angular Router é um module que permite navegar entre as diferentes views dos diferentes componentes que formam a aplicação.
+Usa a URL do navegador como uma instrução para navegar entre diferentes views geradas por cliente. Parâmetros adicionais podem ser adicionados.
+O histórico de API do hmtl5 possibilita que os desenvolvedores modifiquem a URL do site sem que a página seja atualizada totalmente.
+O pushState() permite adicionar uma entrada no histórico do navegador sem causar a ação de atualizar a página; o replaceState() modifica a entrada.
+É necessário definir uma base, um local a partir do qual especificamos partes adicionais ao caminho URL que não resultarão em atualizar - <base href="/">
