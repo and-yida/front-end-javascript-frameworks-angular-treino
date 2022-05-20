@@ -152,5 +152,87 @@ ROUTING
 Angular Router é um module que permite navegar entre as diferentes views dos diferentes componentes que formam a aplicação.
 Usa a URL do navegador como uma instrução para navegar entre diferentes views geradas por cliente. Parâmetros adicionais podem ser adicionados.
 O histórico de API do hmtl5 possibilita que os desenvolvedores modifiquem a URL do site sem que a página seja atualizada totalmente.
-O pushState() permite adicionar uma entrada no histórico do navegador sem causar a ação de atualizar a página; o replaceState() modifica a entrada.
-É necessário definir uma base, um local a partir do qual especificamos partes adicionais ao caminho URL que não resultarão em atualizar - <base href="/">
+O pushState() permite adicionar uma entrada no histórico do navegador sem causar a ação de recarregar a página; o replaceState() modifica a entrada.
+É necessário definir uma base, um local a partir do qual especificamos partes adicionais ao caminho URL que não resultarão em recarregar - <base href="/">
+Outra forma de fazer navegação é através de hashtags; especificar um link usando hashtag indica que ele se refere a um link na mesma página - o que também não causa recarregamento, apenas redireciona para outro local na mesma página.
+Exemplo:
+    http://example.com/home
+    Modificar a última parte do URL para
+    http://example.com/menu
+    usando um método push state, e a mudança de URL não causa recarregamento.
+
+Angular Router
+Dependendo do URL exibido no navegador, iremos utilizá-lo para navegar entre as diferentes views dos diferentes componentes da aplicação Angular.
+Devemos importar o Router Module e os routes.
+Routes
+Routes permitem definir as rotas. São especificadas sob a forma de um caminho e o correspondente componente.
+    {path: "/home", component: HomeComponent}
+routerOutlet
+No template do AppComponent, incluimos a diretiva routerOutlet. A view correspondente ao componente é incluída sempre que essa diretiva aparece.
+    <router-outlet></router-outlet>
+routerLink
+Para acionar a navegação, utilizamos a-tags com a diretiva routerLink. Ela especifica um caminho.
+    <a routerLink="/menu">Menu</a>
+Quando o link é clicado, essa ação aciona o Angular Router para mudar a navegação para uma determinada view. A ligação entre o link e o componente já foi dado no router.
+
+
+ANGULAR ROUTING
+
+Criar um module para receber o routing
+    ng generate module app-routing
+Incluir o import no app.module.ts
+    import { AppRoutingModule } from './app-routing/app-routing.module';
+
+    @NgModule({
+    . . .
+  
+    imports: [
+    . . .,
+    AppRoutingModule
+    ],
+  
+    . . .
+  
+    })
+
+No app-routing.module.ts, incluir os imports do module Router e routes.
+    import { RouterModule, Routes } from '@angular/router';
+
+    import { routes } from './routes';
+
+    @NgModule({
+    imports: [
+        CommonModule,
+        RouterModule.forRoot(routes)
+    ],
+    exports: [ RouterModule ],
+
+O RouterModule recebe como parâmetro a configuração de routes. Isso foi indicado acima por:
+    RouterModule.forRoot(routes)
+
+Para torná-lo disponível para inclusão no appmodule, incluímos acima também o export.
+    exports: [ RouterModule ],
+
+No arquivo ts de routes, importar também o router.
+    import { Routes } from '@angular/router';
+
+Devemos anexar a cópia do import de todos os componentes de interesse da aplicação.
+    import { MenuComponent } from '../menu/menu.component';
+    import { DishdetailComponent } from '../dishdetail/dishdetail.component';
+    import { HomeComponent } from '../home/home.component';
+    import { AboutComponent } from '../about/about.component';
+    import { ContactComponent } from '../contact/contact.component';
+
+Devemos criar uma constante com os objetos 'routes', cada qual declarado com um caminho e seu correspondente componente, conforme o modelo.
+    export const routes: Routes = [
+    { path: 'home',  component: HomeComponent },
+    //quando o URL incluir "/home", estaremos navegando no HomeComponent
+    { path: 'menu',     component: MenuComponent },
+    { path: '', redirectTo: '/home', pathMatch: 'full' }
+    ];
+    //quando não houver nada incluído no URL, a página inicial, será o home
+
+No app.component.html, incluimos a diretiva <router-outlet>. Onde houver essa diretiva, o Angular automaticamente usa esse espaço para exibir a view correspondente.
+
+Último passo é incluir a diretiva routerLink nos botões da toolbar, no componente header. Lembrando, através da toolbar podemos saltar entre diferentes partes dentro da aplicação web. Cada routerLink vai apontar para um path, como exemplo:
+    <a mat-button routerLink="/home"><span class="fa fa-home fa-lg"></span> Home</a>
