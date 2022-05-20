@@ -236,3 +236,31 @@ No app.component.html, incluimos a diretiva <router-outlet>. Onde houver essa di
 
 Último passo é incluir a diretiva routerLink nos botões da toolbar, no componente header. Lembrando, através da toolbar podemos saltar entre diferentes partes dentro da aplicação web. Cada routerLink vai apontar para um path, como exemplo:
     <a mat-button routerLink="/home"><span class="fa fa-home fa-lg"></span> Home</a>
+    
+    
+SINGLE PAGE APPLICATIONS
+
+Em um site tradicional, o navegador faz a requisição ao server para baixar o conteúdo a ser exibido toda vez que uma página desse site é aberto. Isso requer o carregamento de toda uma página a cada vez.
+Diferentemente, as aplicações de página única fazem requisição do download da aplicação completa. Um conjunto de assets são baixados do server para renderizar a aplicação no cliente. Cliques em links fazem requisições ao server apenas para download de alguns dados, geralmente no formato de dados JSON.
+O carragamento inicial é um pouco mais custoso e demorado, mas as demais requisições são leves. A interação se assemelha, portanto, a de um aplicação desktop.
+Outra particularidade é a possibilidade de implementar a pré-renderização de algumas das views no lado do servidor, o que permite exibir parte da informação ao cliente mais rapidamente, enquanto o resto da aplicação ainda é baixada pelo navegador.
+Boa parte do trabalho de renderizar a aplicação é delegada ao cliente, aliviando o servidor. Isso abre espaço para pensar em escalar a aplicação. 
+Alguns dos desafios desse tipo de aplicação consistem em: manter um histórico de acesso, fazer análises de dados e diminuir o tempo de carregamento inicial.
+
+
+DEVELOPING SINGLE PAGE
+
+Em nosso proejto, aplicamos um filtro de array sobre a classe DISHES.
+Função filter
+    array.filter(function(currentValue), thisValue)
+Ex.:
+    getDish(id: string): Dish {
+    return DISHES.filter((dish) => (dish.id === id))[0];
+    //o filtro é aplicado ao array DISHES, retorna objetos do tipo dish; à direita da arrow function temos as declarações da função. estamos filtrando os objetos dish por id -  quando o id passado for igual ao id do objeto, esse objeto é extraído.
+    //como a função retorna os valores dentro de um novo array, [0] vai limitar a quantidade de objetos a apenas 1, pois queremos um dish específico.
+
+Ex.:
+  getFeaturedDish(): Dish {
+    return DISHES.filter((dish) => dish.featured)[0];
+  }
+  //featured retorna um booleano, logo o dish featured terá valor 1 e será extraído pelo filter. estamos extraindo novamente apenas um dish de interesse
