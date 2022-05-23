@@ -250,7 +250,7 @@ Alguns dos desafios desse tipo de aplicação consistem em: manter um histórico
 
 DEVELOPING SINGLE PAGE
 
-Em nosso proejto, aplicamos um filtro de array sobre a classe DISHES.
+Em nosso projeto, aplicamos um filtro de array sobre a classe DISHES.
 Função filter
     array.filter(function(currentValue), thisValue)
 Ex.:
@@ -264,3 +264,73 @@ Ex.:
     return DISHES.filter((dish) => dish.featured)[0];
   }
   //featured retorna um booleano, logo o dish featured terá valor 1 e será extraído pelo filter. estamos extraindo novamente apenas um dish de interesse
+
+No componente home, inserimos as classes FeaturedDish e FeaturedPromotion criadas anteriormente, pois vamos construir dois cards ao template.
+export class HomeComponent implements OnInit {
+  dish!: Dish;
+  promotion!: Promotion;
+
+  constructor(private dishservice: DishService,
+    private promotionservice: PromotionService) { }
+
+  ngOnInit() {
+    this.dish = this.dishservice.getFeaturedDish();
+    this.promotion = this.promotionservice.getFeaturedPromotion();
+  }
+
+
+ANGULAR ROUTERS: PARAMETERS
+
+Podemos especificar valores como parâmetro no URL, de forma que o caminho de um componente permita passar informação de um componente a outro.
+O parâmetro de rota especificado no caminho é um token. Ex.: menu/:id
+Podemos especificar um parâmetro de rota no caminho, e a partir de outra localização, passar o comoponente através do parâmetro para outro componente.
+É possível especificar parâmetros de rota ao especificar um link de vetor de parâmetros. Ex.:
+    <a *ngFor="let dish of dishes" [routerLink]="['/dishdetail',dish.id]>
+Outra forma é usar um método fornecido pelo Router Module chamado router navigate. Ex.:
+    this.router.navigate(['/dishdetail',dish.id])
+Devemos, além disso, permitir que o componente tome o valor especificado como token no link URL. Isso é possível através de um service fornecido pelo Router Module chamado ActivatedRoute Service.
+Router service trabalha a partir de:
+    URL: possui um observador para os caminhos de rota (route paths), representados como um vetor de strings para cada parte do caminho;
+    parames: possui observador que contém os parâmetros específicos da rota;
+    queryparams: possui observador que contém parâmetros query disponíveis a todas as rotas.
+
+Em nosso projeto, no arquivo TS routes, adicionamos um novo link.
+    export const routes: Routes = [
+        { path: 'dishdetail/:id',     component: DishdetailComponent },
+    //o parâmetro de rota aqui é id, no qual passaremos os ids dos pratos
+
+No menu, queremos exibir cada prato em um link, fazendo uso dos parâmetros dentro dos caminho de rota.
+No template, queremos que os items redirecionem para os links que, ao serem clicados, mostrem os detalhes dos respectivos itens. Habilitamos o router link.
+    <mat-grid-tile *ngFor="let dish of dishes" [routerLink]="['/dishdetail', dish.id]">
+    //cada dish recebe um link de rota espeficicado por seu próprio id
+
+No componente dishdetail, devemos tornar acessíveis os parâmetros dos objetos que serão passados para construir os links.
+    import { DishService } from '../services/dish.service';
+    //de onde obtemos os objetos
+
+    import { Params, ActivatedRoute } from '@angular/router';
+    import { Location } from '@angular/common';
+    //location permite rastrear dados da página no histórico do navegador; é útil para navegar para páginas anteriores.
+
+    export class DishdetailComponent implements OnInit {
+
+        dish!: Dish;
+
+        constructor(private dishservice: DishService,
+            private route: ActivatedRoute,
+            private location: Location) { }
+        //services necessários
+
+        ngOnInit() {
+            const id = +this.route.snapshot.params['id'];
+            this.dish = this.dishservice.getDish(id);
+        }
+
+        goBack(): void {
+            this.location.back();
+        }
+        //location fornece um método que permite voltar para o item anterior no histórico do navegador
+
+No card da descrição do pratos (dishdetail.component.hmtl), disponilizamos um botão que faz usado do método goBack.
+    <button mat-button (click)="goBack()">BACK</button>
+    
