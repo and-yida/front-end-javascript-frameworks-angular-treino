@@ -1,0 +1,4 @@
+DIALOGS
+
+O Angular fornece o Dialogue Component, que permite sobrepor conteúdo sobre a view atual.
+Com a classe "flex-spacer", abrimos espaço entre os conteúdos anteriores e posteriores.
