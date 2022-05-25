@@ -1,4 +1,119 @@
 DIALOGS
 
 O Angular fornece o Dialogue Component, que permite sobrepor conteúdo sobre a view atual.
-Com a classe "flex-spacer", abrimos espaço entre os conteúdos anteriores e posteriores.
+Para criar uma caixa de diálogo, geramos um novo componente para ela. No arquivo ts, devemos importar o module Mat Dialog.
+    import {MatDialog, MatDialogRef} from '@angular/material/dialog';
+
+Em nosso projeto, criamos um componente de login em toolbar. No template:
+    <mat-toolbar color="primary">
+        Login
+    <span class="flex-spacer"></span>
+    <button mat-button mat-dialog-close>&times;</button>
+    </mat-toolbar>
+    //Com a classe "flex-spacer", abrimos espaço entre os conteúdos anteriores e posteriores. O elemento declarado irá ser empurrado o mais à direita possível da tela.
+No app.module.ts, também incluir o MatDialog. Além disso, devemos declarar o componente login como entrada.
+    entryComponents: [
+    LoginComponent
+    ],
+
+O header também precisa ser atualizado. É aí que o diálogo de Login será inserido.
+    import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+    import { LoginComponent } from '../login/login.component';
+    ...
+    constructor(public dialog: MatDialog ) { }
+
+Inserimos uma função que, quando invocada, deve desencadear a exibição do componente login.
+    openLoginForm() {
+        this.dialog.open(LoginComponent, {width: '500px', height: '450px'});
+    }
+
+
+ANGULAR TEMPLATE-DRIVEN FORMS
+
+Angular suporta dois tipos de formulários: formulário guiado por template e formulário reativo.
+Formulários são amplamente utilizados para permitir usuários introduzir informação no site ou aplicação.
+Angular fornece: ligação de dados de mão dupla, rastreamento de alterações e validação e tratamento de erros.
+
+Template-driven forms
+Neste tipo, usamos a sintaxe do Angular para template para construir um formulário, utilizando elementos de formulário e diretivas específicas. Fazemos uso da diretiva ngModel.
+Two-way data binding vincula informação do formulário e variáveis JS de objetos em classes.
+Devemos importar os modules de formulários.
+    import { MatFormFieldModule } from '@angular/material/form-field';
+    //permite agrupar elementos de formulário
+    import { MatInputModule } from '@angular/material/input';
+    //permite criar um campo de entrada
+    import { MatCheckboxModule } from '@angular/material/checkbox';
+    //permite criar checkbox
+    import { FormsModule } from '@angular/forms';
+
+Em nosso projeto, no login.html adicionamos
+    <p>{{ user | json }}</p>
+    //forma de exibir alterções enquanto digitamos informação no formulário, refletidas no estado do formulário
+
+Criamos o forms com:
+    <form novalidate (ngSubmit)="onSubmit()">
+    //novalidate, pois a validação não será feita através de HTML padrão, deixaremos a validação com o Angular
+        <mat-dialog-content>
+        //colocamos o formulário em uma caixa de diálogo
+            <p>
+            <mat-form-field>
+            //mat-form-field agrupa elementos relacionados que serão usados em conjunto
+                <input matInput placeholder="Username" type="text" [(ngModel)]="user.username" name="username">
+                //[(ngModel)] garante o two-way data binding
+                //user será um objeto JS, que vai conter a propriedade "username" e vai rastrear o valor entrado neste campo de entrada do formulário
+            </mat-form-field>
+            <mat-form-field>
+                <input matInput placeholder="Password" type="password" [(ngModel)]="user.password" name="password">
+            </mat-form-field>
+            <mat-checkbox [(ngModel)]="user.remember" name="remember">Remember Me</mat-checkbox>
+            //quando selecionado, esse botão informa que usuário e a senha devem ser salvas na aplicação
+            </p>
+
+Adicionamos botões que irão performar ações.
+    <mat-dialog-actions>
+        <span class="flex-spacer"></span>
+        <button mat-button mat-dialog-close>Cancel</button>
+        <button type="submit" mat-button class="background-primary text-floral-white">Login</button>
+    </mat-dialog-actions>
+
+No arquivo ts do componente login, criamos um objeto "user" com os propriedades "username", "password" e "remember". Dessa forma, conseguimos atrelar essas três propriedades aos elementos do formulário no template.
+    user = {username: '', password: '', remember: false};
+    //username e password são passados vazios
+No construtor, devemos indicar o dialog ref.
+    constructor(public dialogRef: MatDialogRef<LoginComponent>) { }
+
+
+TEMPLATE-DRIVEN FORM VALIDATION
+
+É possível fazer validação no lado do cliente.
+Devemos desativar a validação de formulários do HMTL5, para transferir essa tarefa ao Angular: <form novalidate>
+Utilizamos variáveis de referência de template (como "username" e "login form") que podem ser utilizadas no template para referenciar os campos do formulário
+    <input...#username="ngModel"...>
+    //#variável que referencia um campo do formulário = "ngModel"
+Os controles de estado são adicionados às variáveis para fazer validações.
+    .pristine : verdadeiro se o campo/formulário não foi alterado;
+    .dirty : contrário de pristine;
+    .valid : verdadeiro se o campo/formulário é válido;
+    .invalid : contrário de valid.
+
+Exemplos de validação
+Desabilitar botão de submeter se o estado do formulário é inválido.
+    <button type="submit" ...
+        [disabled]="loginForm.form.invalid">Login</button>
+Exibir erro caso a entrada do usuário não estiver de acordo com as regras especificadas para aquele campo.
+    <mat-form-field>
+        <input matInput placeholder="Username" type="text" [(ngModel)]="user.name"
+        name="username" #username="ngModel" required>
+        <mat-error *mgIf="username.erros?.required">Username is required</mat-error>
+    </mat-form-field>
+
+Em nosso projeto, adicionamos a variável de template para rastrear o estado do formulário.
+    <form ...  #loginForm="ngForm" ...>
+Para os campos:
+    <input matInput... #username="ngModel" required>
+    //se o campo estiver vazio, o erro sobre "required" irá aparecer (pois o preenchimento da campo é obrigatório)
+Deabilitamos o botão de login (submit) quando o estado do formulário for inválido.
+    <button type="submit" mat-button ... [disabled]="loginForm.form.invalid">
+Para especificar um tipo de erro, incluímos em cada campo "mat-error".
+    <mat-error *ngIf="password.errors?.required">Password is required</mat-error>
+    //o erro está sobre "required", isto é, se o usuário não preenche o campo de senha.
