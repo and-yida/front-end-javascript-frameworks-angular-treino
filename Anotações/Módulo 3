@@ -117,3 +117,52 @@ Deabilitamos o botão de login (submit) quando o estado do formulário for invá
 Para especificar um tipo de erro, incluímos em cada campo "mat-error".
     <mat-error *ngIf="password.errors?.required">Password is required</mat-error>
     //o erro está sobre "required", isto é, se o usuário não preenche o campo de senha.
+
+
+ANGULAR REACTIVE FORMS
+
+Nos formulários reativos, há gerenciamento explícito de dados fluindo entre um model de dados que não pertence a UI (back-end)e um modelo de formulário de UI.
+Criamos uma árvore de objetos de controle do formulário dentro da classe componente. Dessa forma, criamos a estrutura do formulário no componente e vinculamos esta estrutura aos controles do formulário no âmbito do template.
+Testagem e validação são mais fáceis nos formulários reativos do que nos digiridos por template, pois, neste último caso, boa parte da estrutura está no código do template.
+Os valores advindos dos elementos do formulário são imediamente disponibilizados e sincronizados com o código TypeScript.
+O Angular fornece algumas classes como:
+    FormControl: dispõe controles individuais que rastreiam valores e estados de validação;
+    FormGroup: organiza FormControls em um grupo;
+    AbstractControl: dispõe classe que funciona como base abstrata para o os FormControls;
+    FormArray: define vetores de instâncias de AbstractControls.
+O FormBuilder permite criar formulários com TS e os vincular aos controles no template.
+Ao criar o model de formulário no código TS e preenchê-lo, é necessário que o model de dados seja mapeado para o model de formulário a fim de preencher os valores.
+O model de formulário e o model de dados são separados. Alterações realizadas em elementos do DOM no formulário são direcionadas ao model de formúlario, ao passo que
+os dados do formulário devem ser refletidos de volta ao model de dados (no back-end).
+Quando pegamos o model de dados do back-end, os valores são passados ou mapeados para o model de formulário. Há duas formas de preencher o model de formulário a partir do model de dados:
+    setValue(): método que atribui valor a todo controle a partir do model de dados de uma só vez;
+    patchValue(): método que atualiza apenas alguns valores dos controles no formulário.
+
+Em nosso projeto, importamos o module de ReactiveForms e outros no app.module.
+    import { ReactiveFormsModule } from '@angular/forms';
+    import { MatSelectModule } from '@angular/material/select';
+    //habilita selecionar elemento
+    import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+    //habilita alternar slide
+
+    imports: [
+    . . .
+    MatSelectModule,
+    MatSlideToggleModule,
+    ReactiveFormsModule
+  ],
+
+Criamos um arquivo feedback.ts que representa o model de dados correspondente ao model de formulário que utilizaremos na aplicação. Aqui consta uma classe com os atributos cujos valores esperamos receber dos usuários no formulário.
+    export class Feedback {
+    firstname: string;
+    lastname: string;
+    telnum: number;
+    email: string;
+    agree: boolean;
+    contacttype: string;
+    message: string;
+};
+O intuito é criar um formulário de feedback dos clientes.
+
+Como vamos mapear esses valores dentro do model de formulário, a partir de componente, vamos exportar a seguinte constante que consiste em um vetor de strings.
+    export const ContactType = ['None', 'Tel', 'Email'];
