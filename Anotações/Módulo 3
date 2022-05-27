@@ -143,7 +143,7 @@ Em nosso projeto, importamos o module de ReactiveForms e outros no app.module.
     import { MatSelectModule } from '@angular/material/select';
     //habilita selecionar elemento
     import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-    //habilita alternar slide
+    //habilita botão slide toggle
 
     imports: [
     . . .
@@ -154,15 +154,77 @@ Em nosso projeto, importamos o module de ReactiveForms e outros no app.module.
 
 Criamos um arquivo feedback.ts que representa o model de dados correspondente ao model de formulário que utilizaremos na aplicação. Aqui consta uma classe com os atributos cujos valores esperamos receber dos usuários no formulário.
     export class Feedback {
-    firstname: string;
-    lastname: string;
-    telnum: number;
-    email: string;
-    agree: boolean;
-    contacttype: string;
-    message: string;
-};
+      firstname: string;
+      lastname: string;
+      telnum: number;
+      email: string;
+      agree: boolean;
+      contacttype: string;
+      message: string;
+    };
+    export const ContactType = ['None', 'Tel', 'Email'];
 O intuito é criar um formulário de feedback dos clientes.
 
-Como vamos mapear esses valores dentro do model de formulário, a partir de componente, vamos exportar a seguinte constante que consiste em um vetor de strings.
-    export const ContactType = ['None', 'Tel', 'Email'];
+No componente contact, onde o formulário será inserido, importamos os modules necessários e também as classes que criamos.
+    import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+    import { Feedback, ContactType } from '../shared/feedback';
+
+Declaramos as variáveis:
+    feedbackForm: FormGroup;
+    //variável do tipo FormGroup - esse será o model de formulário que irá hospedar nosso reactive form
+    feedback: Feedback;
+    //será o model de dados - posteriormente, pode ser atrelado ao lado do servidor
+    contactType = ContactType;
+    //vetor criado anteriormente
+
+No construtor, temos o FormBuilder
+    constructor(private fb: FormBuilder) {
+        this.createForm();
+    }
+    //o método createForm será invocado através do construtor, e ele próprio criará o formulário de fato
+
+    createForm() {
+      this.feedbackForm = this.fb.group({
+        firstname: '',
+        lastname: '',
+        telnum: 0,
+        email: '',
+        agree: false,
+        contacttype: 'None',
+        message: ''
+      });
+    }
+    //utilizamos do FormBuilder para criar o feedbackForm. fornece um método chamado "group" que permite criar um grupo de controles de formulário.
+
+Criamos um método para permitir a submissão no formulário. Adquirimos os valores do model de formulário e vinculamos ao model de dados, e como os dois, neste caso, têm a mesma estrutura, podemos facilmente pegar esses valores.
+    onSubmit() {
+        this.feedback = this.feedbackForm.value;
+        this.feedbackForm.reset();
+        //o formulário é resetado depois de submetido
+    }
+
+Agora mapeamos esses elementos dentro do template. No html de contact, criamos um div para o formulário:
+    <form novalidate [formGroup]="feedbackForm" (ngSubmit)="onSubmit()">
+    //o método "onSubmit()" é invocado quando da submissão do formulário
+    //formGroup vincula o template aqui e o model do formulário em TS
+Os campos do formulário, como exemplo:
+    <mat-form-field class="half-width">
+          <input matInput formControlName="firstname" placeholder="First Name" type="text">
+    </mat-form-field>
+    //o campo recebe um input com matInput, do tipo formControlName, vinculado à propriedade que declaramos no model de formulário como "firstname"
+Com o FormBuilder, precisamos somente atrelar os nomes dos controles de formulário às propriedades da classe utilizada como model de dados.
+
+Adicionamos um botão do tipo slide toggle, que admite os estados selecionado ou não selecionado (valores booleanos).
+    <mat-slide-toggle formControlName="agree">May we contact you?</mat-slide-toggle>
+
+Criamos um select element que pemite escolher um dentre os elementos de uma lista. As opções são passadas sob "mat-option", através de interpolação.
+    <mat-select placeholder="How?" formControlName="contacttype">
+            <mat-option *ngFor="let ctype of contactType" [value]="ctype">
+              {{ ctype }}
+            </mat-option>
+    </mat-select>
+    //aqui entra o vetor "contactType", passado como constante, com as opções de formas de contato disponíveis.
+
+Para entrar com o feedback, criamos uma área de texto.
+    <mat-form-field class="full-width">
+          <textarea matInput formControlName="message" placeholder="Your Feedback" rows=12></textarea>
