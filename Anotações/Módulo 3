@@ -228,3 +228,103 @@ Criamos um select element que pemite escolher um dentre os elementos de uma list
 Para entrar com o feedback, criamos uma área de texto.
     <mat-form-field class="full-width">
           <textarea matInput formControlName="message" placeholder="Your Feedback" rows=12></textarea>
+          
+O método para resetar o formulário.
+    this.feedbackFormDirective.resetForm();
+Importamos o module ViewChild para permitir acessar elementos filhos do DOM no template. Na prática, isso irá garantir que o formulário no template seja de fato resetado.
+    import { Component, OnInit, ViewChild } from '@angular/core';
+    ...
+
+    export class ContactComponent implements OnInit {
+    ...
+    @ViewChild('fform') feedbackFormDirective;
+    //o formulário pode ser acessível agora a partir da variável de template que demos a ele: 'fform'
+No template, adicionamos esse nome ao formulário.
+    <form ... #fform="ngForm" ...>
+
+No template, adicionamos ao botão de submit a propriedade de estar desabilitado quando o estado do formulário for inválido.
+    <button type="submit" ... [disabled]="feedbackForm.invalid">Submit</button>
+Adicionamos mat-error nos campos para os quais queremos usar validação. Ex.:
+    <input matInput formControlName="firstname" placeholder="First Name" type="text" required>
+        <mat-error *ngIf="feedbackForm.get('firstname').hasError('required') && feedbackForm.get('firstname').touched">First name is required</mat-error>
+        //se o campo firstname não tiver nada escrito e tiver sido tocado, haverá erro.
+
+
+PROMISES
+
+Promises são um mecanismo para computação assíncrona. Na computação assíncrona, quandos enviamos uma requisição, esperamos que os resultados retornem em um momento posterior, e lidamos com o fato de que isso leva certo tempo.
+Promise é um representante (proxy) para um valor não necessariamente conhecido quando da criação do promise. Ele assegura que futuramente quando os valores estiveram disponíveis, eles serão entregues.
+Primeiramente, a promessa se apresenta no estado pendente. Quando a promessa é solucionada e os resultados são entregues, ele passa ao estado de resolvida ou preenchida. Porém, quando ocorre um erro e a promessa é rejeitada, ela passa ao estado de rejeitada. Quando escrevemos o código, consideramos ambas os casos como possibilidades.
+    new Promise (function (resolve, reject) {...});
+Exemplo:
+    getDishes()
+        .then (function(result) {
+            ...
+        });
+        //se a resolução for bem-sucedida, o then é executado
+
+        .catch (function(error) {
+            ...
+        });
+        //se for rejeitado, o catch é executado. aqui entra algum tratamento de erro
+
+Quando formos lidar com Node Js, veremos que promises são utilizadas em callbacks.
+Promessas podem ser encadeadas.
+Promessas que podem imediamente retornar um resultado, podem ter seus valores apresentados através de:
+    Promise.resolve(result)
+    Promise.reject(error)
+
+Services geralmente retornam promessas aos componentes quando os componentes chamam os métodos do service. Quando a promessa é resolvida, os componentes então terão os resultados.
+Usar as promessas é uma forma de lidar com os atrasos no processo de obter e entregar dados do servidor.
+
+Em nosso projeto, reconfiguramos os services para incluírem promessas. No service dish.service, o método getDishes foi reconfigurado para retornar uma promessa:
+    getDishes(): Promise<Dish[]> {
+    return Promise.resolve(DISHES);
+    }
+    //o método retorna uma promise do tipo vetor de objetos dish caso a promise seja resolvida com sucesso
+    //esse método é do tipo "breve", retornando a promessa instantaneamente. se os resultados fossem buscados em um servidor, isso não seria uma opção, e o processo levaria algum tempo.
+
+Nos componentes, também precisamos reescrever o código de forma que, ao invés de receberem diretamente os dados, eles passem a receber promessas.
+Como exemplo, no componente menu, tínhamos o dishService retornando um vetor de objetos dishes. Agora, esse service deve retornar os resultados da promessa, utilizando o método "then".
+    ngOnInit() {
+        this.dishService.getDishes()
+        .then(dishes => this.dishes = dishes);
+    }
+    //o resultado da promessa é um vetor de dishes, passado como parâmetro, e ao qual a arrow function atribui this dishes.
+
+Até aqui, utlizamos um abordagem para retornar as promessas instantaneamente. Em aplicações reais, no entanto, os dados não são ofertados imediatamente. O service precisa buscar a informação no servidor back-end, e isso leva algum tempo.
+Altermos no projeto as promessas, conforme o exemplo abaixo.
+    getDishes(): Promise<Dish[]> {
+        return new Promise(resolve=> {
+        resolve(DISHES);
+        });
+    }
+
+Considerando agora o delay, podemos manter o usuário informado sobre o fato de que a informação está sendo buscada e é necessário esperar o processo, exibindo algum conteúdo visual que represente esse tempo de espera.
+Em nosso projeto, implementamos um componente do Angular Material, spinner progress, que exibe um disco giratório no template view enquanto os dados estão sendo carregados.
+Importar o module ProgressSpinner no appmodule e incluir no imports.
+    import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+
+No componente menu, se adicionarmos ao menu dos pratos a diretiva *ngIf="dishes" , estaremos forçando que os dados sejam exibidos apenas quando o valor dos objetos dishes sejam conhecidos - isto é, a promise terá que ser resolvida antes. 
+Inserimos também o spinner em um div [hidden] para indicar que, quando o valor de dishes é conhecido, este div não será exibido. Caso contrário, o spinner estará visível.
+  <div [hidden]="dishes">
+    <mat-spinner></mat-spinner><h4>Loading . . . Please Wait</h4>
+Em suma, o menu só aparecerá quando esse processo finalizar; enquanto isso, o spinner aparecerá na tela.
+
+
+ANGULAR AND RXJS
+
+A biblioteca RxJS fornece uma opção para escrever com programação reativa nas aplicações Angular.
+A programação reativa gira em torno do padrão de engenharia de software chamado Observer. Nele, fazemos uso de observables cujo comportamento é monitorado por observers.
+Declaramos objetos como observados ou sujeitos que serão monitorados pelos observadores. Os observadores monitoram as alterações, sendo que os observados notificam os observadores quando da ocorrência de alterações.
+Esse padrão é baseado na concepção de que os dados fluem como correntes através da aplicação, é possível inscrever-se a essa correnteza e pegar dela determinados valores e responder a eles. Os observados emitem valores e os observadores reagem a eles.
+Inscrevemos (subscribe) um observador para observar um observado através de: .subscribe() . A partir daí, o observado informa o observador interessado sobre os valores.
+É possível também determinar o cancelamento ou a revisão do ato de pegar dados de uma observado.
+Na programação reativa, estamos interessados em como os dados fluem pela aplicação. O fluxo é tratado como uma correnteza, de forma que uma mudança pode ser propagada ao longo da aplicação. Uma corrente que entra pode sofrer modificações e criar uma corrente de saída já alterada.
+
+RxJS é uma implementação JavaScript do padrão de projeto Observer e suporte à programação reativa. É uma biblioteca para compor programas com assincronia (callbacks) e baseados em eventos, utilizando sequências de observados. O Angular suporta RxJS.
+RxJS fornece:
+    um tipo principal, o Observable;
+    tipos satélites: Observer, Schedulers, Subjects;
+    operadores: inspirados nos operados de vetores JS, como map, filter, reduce, every, etc.;
+    os valores dos observados são tomados como sequências de vetores, o que permite lidar com eventos assíncronos sob a forma de coleções.
