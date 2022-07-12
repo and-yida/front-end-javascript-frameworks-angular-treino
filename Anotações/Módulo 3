@@ -314,6 +314,7 @@ Em suma, o menu só aparecerá quando esse processo finalizar; enquanto isso, o 
 
 ANGULAR AND RXJS
 
+Observer Pattern
 A biblioteca RxJS fornece uma opção para escrever com programação reativa nas aplicações Angular.
 A programação reativa gira em torno do padrão de engenharia de software chamado Observer. Nele, fazemos uso de observables cujo comportamento é monitorado por observers.
 Declaramos objetos como observados ou sujeitos que serão monitorados pelos observadores. Os observadores monitoram as alterações, sendo que os observados notificam os observadores quando da ocorrência de alterações.
@@ -322,9 +323,67 @@ Inscrevemos (subscribe) um observador para observar um observado através de: .s
 É possível também determinar o cancelamento ou a revisão do ato de pegar dados de uma observado.
 Na programação reativa, estamos interessados em como os dados fluem pela aplicação. O fluxo é tratado como uma correnteza, de forma que uma mudança pode ser propagada ao longo da aplicação. Uma corrente que entra pode sofrer modificações e criar uma corrente de saída já alterada.
 
+RxJS
 RxJS é uma implementação JavaScript do padrão de projeto Observer e suporte à programação reativa. É uma biblioteca para compor programas com assincronia (callbacks) e baseados em eventos, utilizando sequências de observados. O Angular suporta RxJS.
 RxJS fornece:
     um tipo principal, o Observable;
     tipos satélites: Observer, Schedulers, Subjects;
-    operadores: inspirados nos operados de vetores JS, como map, filter, reduce, every, etc.;
+    operadores: inspirados nos operados de vetores (array operators) JS, como map, filter, reduce, every, etc.;
     os valores dos observados são tomados como sequências de vetores, o que permite lidar com eventos assíncronos sob a forma de coleções.
+
+Observables, operators and marble diagrams
+Se imaginarmos uma linha do tempo de um observado, peridiodicamente o observadp emite valores. Organizando esses valores em uma sequência, podemos vê-los como um vetor (array). Esses valores, por intermédio dos operadores, podem passar passar por operações, dando origem a outro conjunto de valores sequenciados. Há, portanto, um novo observado constituído pelos valores transformados do observado original. O segundo observado depende diretamente do primeiro.
+
+Angular and RxJs
+Um exemplo de obtenção de um observado a partir de outro observado.
+No Angular Router, criamos um service e definimos uma rota/URL para cada item do menu (prato), através de seu ID. O ID é declarado como Params, que por sua vez, é um observado. Params é correlacionado aos parâmetros da rota - qualquer alteração no Param é emitida e refletida no URL.
+Ex.:
+    this.dishservice.getDish(+params['id])
+O operador Switchmap pega o observado params e cria um outro observado, o dish, da seguinte maneira: pega o valor do params; extrai o ID do params, que justamente fornece o acesso ao parâmetro da rota; e usa o ID para buscar o dish. A cada mudança do params, isso resulta no emparelhamento de um diferente dish. Dish se transforma em um observado.
+    .pipe(switchMap((params: Params) => this.dishservice.getDish(+params['id'])))
+É possível dar um subscribe no dish e, consequentemente, obter os valores dos objetos e realizar nova operação.
+    .subscribe(dish => {this.dish = dish; this.setPrevNext(dish.id);})
+Qualquer alteração no parâmetro da rota irá se propagar do observado inicial até o novo observado através do operador switchmap. O primeiro observado é monitorado através do método subscribe, e isso permite transformar seus valores em um novo observado.
+Na view, podemos atualizar os valores de um observado presente em um service, como nesse caso. O service dish contém os objetos dish e seus atributos, e estamos pegando o ID de cada objeto para, ou colocar como params da rota, ou para exibir os detalhes de cada prato no menu.
+
+Angular and RxJS
+A biblioteca RxJS já é inclusa na aplicação em sua criação. No componente visado, importamos as funções da biblioteca que desejamos utilizar.
+Em nosso projeto, poderíamos ter no lugar das promises,observables que retornam promises. Futuramente, quando utilizarmos services HTTP para buscar dados no servidor, os métodos HTTP irão retornar observables. Os services podem simplesmente passar os observables para os componentes e deixar que, tendo subscribe nos observables, façam uso dos dados deles obtidos.
+
+No caso em que utilizamos observables que retornam promises, no service dish, importamos:
+    import { of } from 'rxjs';
+    import { delay } from 'rxjs/operators';
+Atualizamos os métodos aí para fazer uso de observados. Uma promessa irá ser retornada convertendo o observado em uma promessa usando uma das funções de conversão "firstValueFrom" ou "lastValueFrom" . Dessa forma, se possuimos uma promessa que queremos alterar, mas não queremos alterar todos os componentes que fazem uso dela, convertemos um observado nesta promessa (o observado ficará responsável por emitir a promessa para os componentes). A limitação aqui é que promessas emitem apenas um item, quando observados podem conter um vetor deles.
+    getDishes(): Promise<Dish[]> {
+        return firstValueFrom(of(DISHES).pipe(delay(2000)));
+    }
+    //método getDishes fará uso de um observado e o converterá em uma promessa; a promessa por sua vez é enviada ao componente.
+    //firstValueFrom resolve a promessa com o primeiro valor que é emitido pelo observado.
+    //delay está sendo utilizado só para simular o delay do servidor
+
+Demonstrada a forma com que são usadas as promessas, subtituimos novamente o código - no lugar das promessas podemos utilizar diretamente os observados. Como dito anteriormente, isso faz mais sentido pois quando usarmos services HTTP, vamos lidar com os observables.
+    getDishes(): Observable<Dish[]> {
+        return of(DISHES).pipe(delay(2000));
+    }
+    
+Agora que os services retornam observados, devemos alterar os componentes para que façam uso dos observados. Basta trocar o método "then" por "subscribe", como no exemplo a seguir.
+    ngOnInit() {
+        this.dishService.getDishes()
+    .   subscribe(dishes => this.dishes = dishes);
+    }
+
+Params observable
+Vamos lidar agora com um observable que é embutido no Angular. O module Router dispõe do params, o qual aplicamos no service activatedroute.
+
+Incluimos no service dish um novo método:
+    getDishIds(): Observable<string[] | any> {
+        return of(DISHES.map(dish => dish.id ));
+    }
+O método retorna um array de objetos dish e extrai os IDs de cada item.
+O operador de vetor map pega cada item do vetor, mapeia isso em outro item e constrói um novo vetor, retornando este vetor modificado. Em nosso caso, o novo vetor contém apenas os valores de interesse, os IDs de cada item.
+
+Atualizando o componente dishdetail, declaramos a variável:
+    dishIds: string[];
+    //dishIds vai receber um vetor de todos os IDs dos pratos
+
+No Angular, o service activated route fornece um conjunto de observados. Um deles é o params, que consiste em uma forma de obter os valores de parâmetro para a URL. Nós passamos o ID como parâmetro, e ele passou a funcionar como um observado - na medida em que o valor muda, há um reação correspondente.
