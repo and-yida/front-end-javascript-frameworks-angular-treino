@@ -1,0 +1,32 @@
+NETWORKING ESSENTIALS
+
+Aplicações web geralmente possuem backend em nuvem, onde é hospedado o servidor.
+Serviços de infraestrutura baseados em nuvem como: Amazon, Web Services, Heroku ou Digital Ocean.
+O front-end comunica com a aplicação Angular - server logic -, e, por trás, o server logic se comunica com um armazenamento como o banco de dados - banck-end.
+
+http
+HTTP é o protocolo usado para comunicação entre o lado do cliente (client) e o lado do servidor (server). É um application layer protocol.
+
+url
+O protocolo HTTP precisa ser abastecido com um URL - um string atrelado a um http colon.
+
+json
+JavaScript Object Notation é uma forma de codificação de dados que trafegam entre o lado do cliente e o lado do servidor, e vice-versa.
+
+xml
+XML é outra forma de codificação dos dados durante esse tráfego.
+
+soap
+SOAP são protocolos que permitem a comunicação entre entidades de distribuição dentro do network.
+
+rest
+Representational State Transfer
+
+CLIENT-SERVER COMMUNICATION
+
+A comunicação entre cliente e servidor resulta em uma soma de delay, enquanto o dado é buscado ou atualizado no servidor.
+É necessário programar levando em consideração que é necessário informar o usuário de que o processo leva um tempo, e que é possível que não seja possível obter o dado do servidor (falha na conexão, por exemplo).
+
+http
+Hypertext Transfer Protocol é um protocolo de comunicação do servidor do cliente, isto é, um protocolo utilizado para codificar as mensagens trocado entre o cliente - em nosso caso, a aplicação Angular -, e o servidor. Permite reter documentos baseados em hipertexto a partir do servidor, e informação do servidor codificada em um dos formatos padrão como JSON ou XML.
+Essa comunicação tem o suporte dos verbos do HTTP: head, get, post, put, trace, delete options e connect.
