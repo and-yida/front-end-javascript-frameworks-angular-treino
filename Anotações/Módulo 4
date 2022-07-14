@@ -30,3 +30,15 @@ A comunicação entre cliente e servidor resulta em uma soma de delay, enquanto 
 http
 Hypertext Transfer Protocol é um protocolo de comunicação do servidor do cliente, isto é, um protocolo utilizado para codificar as mensagens trocado entre o cliente - em nosso caso, a aplicação Angular -, e o servidor. Permite reter documentos baseados em hipertexto a partir do servidor, e informação do servidor codificada em um dos formatos padrão como JSON ou XML.
 Essa comunicação tem o suporte dos verbos do HTTP: head, get, post, put, trace, delete options e connect.
+Com o HTTP, nós enviamos uma requisição do cliente para o servidor, sob a forma de uma request message. A request message carrega um URL que indica o que queremos do servidor. Se queremos dados a serem baixados do servidor, estamos falando de uma mensagem de get. O servidor busca os dados, os empacota e envia de volta ao cliente.
+Se o retorno do servidor for sob a forma de JS, HTML e CSS, o navegador já é capaz de renderizar o site. Mas em aplicações Angular, por exemplo, recebemos dados em maior parte sob a forma de JSON ou XML - exceto pelo download inicial de todos os recursos necessários para que o site seja executado pelo navegador.
+A mensagem de requisão consiste em uma request line mais um conjunto de headers com informações adicionais que qualificam a requisição. O body contém informação adicional, especialmente se o cliente está enviando dados para o servidor. Por exemplo: informação de um formulário é enviado, no formato de JSON, do lado de cliente para o lado do servidor.
+De forma genérica, a request line possui um método (verbo get, put, delete, etc.), um URL e a versão do protocolo. Os headers contêm o o nome do campo header e seu valor.
+A requisição é respondida por uma response message, que também contém uma linha inicial, status line, com informação sobre como a requisição foi processada e o que daquilo que está sendo enviado de volta ao cliente está armazenado; headers com informação adicional e o body. Se a requisão tiver sido, por exemplo, uma página HTML, o body trará esse arquivo.
+
+json
+JavaScript Object Notation é o formato comumente usado na codificação realizada pelo servidor. Com ele, é fácil converter um objeto JS para a notação JSON e vice-versa. Os dados são estruturados como um coleção de pares de nomes e valores e listas ordernadas de valores.
+
+
+SETTING UP A SERVER USING JSON-SERVER
+
