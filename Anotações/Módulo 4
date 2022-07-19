@@ -42,3 +42,17 @@ JavaScript Object Notation é o formato comumente usado na codificação realiza
 
 SETTING UP A SERVER USING JSON-SERVER
 
+Em nosso projeto, utilizaremos um Node module chamado JSON Server que permite configurar um servidor simples que disponibiliza dados no formato JSON e também imagens utilizadas na aplicação.
+Instalamos o module:
+    npm install json-server -g
+Na pasta criada json-server, criamos o servidor na máquina
+    json-server --watch db.json -d 2000
+    //-d 2000 insere um delay de 2 segundos para simular o delay real de um servidor online
+O servidor tem um watch para monitorar o arquivo db.json, que funciona como nosso banco de dados. Quando houver uma mudança neste arquivo, o servidor passa a servir os dados atualizados.
+São listados no terminal o conjunto de resources criados através de seus URLs. O servidor estático criado também estará indicado (localhost:3000).
+Dessa maneira, contamos com um servidor que suporta uma API REST que podemos acessar de nossa aplicação.
+
+
+ANGULAR HTTP CLIENT
+
+
