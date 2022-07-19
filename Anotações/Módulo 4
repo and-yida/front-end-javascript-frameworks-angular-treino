@@ -55,4 +55,39 @@ Dessa maneira, contamos com um servidor que suporta uma API REST que podemos ace
 
 ANGULAR HTTP CLIENT
 
+Angular dá suporte a HTTP através do Angular HTTP Client.
+O Angular suporta protocolo HTTP para permitir a comunicação entre o cliente e o servidor baseado em HTTP.
+A maioria dos navegadores modernos costumava utilizar XMLHttpRequest (XHR) para comunicação com o servidor. Além disso, os navegadores estão adotando o fetch() API como alternativa para essa função.
+O service deve lidar com a interação entre o servidor, e os componentes obtêm dados através da chamada aos métodos do service.
+Tomando o atual estágio de nosso projeto, devemos fazer alterações no service para permitir o HTTP Module comunicar-se com o servidor e obter e fornecer informação dele. O servidor HTTP em si fornecerá os dados ao cliente, e o HTTP Module retorna os dados ao nosso service por meio do observable.
+O HTTP Client processa o observado que é fornecido através do Angular HTTP Module e supre o componente com esse observado.
+Até agora, já demos subscribe no observado que é fornecido pelo nosso service. Precisamos lidar com o fluxo de dados que flui pelo observado.
+Quando o Angular está lidando com uma resposta do servidor no formato JSON, o método get do Angular HTTP Client converte a resposta JSON em um objeto anônimo. O HTTP Client não sabe exatamente como interpretar o formato desse objeto, por isso, podemos especificar ao Client o formato através de uma declaração de uma classe JavaScript. Dessa forma, a saída do get pode ser facilmente consumida pela aplicação.
+Ex.:
+    this.http.get<Dish> ...
+    //especificamos que o dado retornado do servidor é convertido em um objeto da classe Dish
 
+Error handling
+Devemos preparar que o Client lide com os erros do servidor. Configuramos o service para pegar os erros através do método catch(). A mensagem de erro é enviada ao componente e lidada por ele (exemplo: exibir a mensagem de erro na view para informar o usuário do erro). No service, a informação de erro será convertida em uma string passada ao componente por meio do método throwError() do observado.
+    .subscribe(data => ... ,
+        error => ...);
+
+
+BRIEF REPRESENTATIONAL STATE TRANSFER (REST)
+
+Web Services são uma maneira de desenvolver sistemas para dar suporte à interoperabilidade entre sistemas conectados por um network, como a Internet, por exemplo. Essa é uma arquitetura orientada a serviço, que usa formas padronizadas de integração. Duas máquinas conectadas à Internet podem comunicar-se entre si.
+Duas abordagens comuns no suporte a web services são SOAP e REST.
+Serviços baseados em SOAP (Simple Object Acess Protocol) utilizam WSDL (Web Services Description Language) para especificar como dois end points comunicam entre si, e XML como formato das mensagens trocadas ente os end points.
+Serviços baseados em REST utilizam na troca entre end points XML ou JSON como formato.
+Na abordagem REST, o servidor suporta um REST API e o cliente pode invocar seus REST API end points para obter informação ou atualizar informação no servidor.
+
+REST é um tipo de arquitetura de software que é especialmente desenvolvido para distribuição de hypermedia pela web. Ela descreve a web como uma aplicação distribuída de hypermedia, em cujos recursos conectados comunicam-se pela troca de representações de estados dos recursos (resources).
+REST foi introduzido por Roy Fielding, que escreveu sobre uma coleção de princípios de network que destaca como os recursos podem estar disponíveis em servidores, e como esses recursos podem ser acessados por clientes via identificação dos recursos usando REST API endpoints.
+Quatro princípios principais:
+    REST é projetado sobre protocolo HTTP: usa os métodos desse tipo de protocolo;
+    É stateless: o servidor não armazena informação sobre o estado após a comunicação ser concluída;
+    Dispõe uma estrutura do tipo diretório, como URLs (Uniform Resource Indicators);
+    O formato de comunicação é JSON ou XML.
+REST se apoia em uma característica importante da web que é o endereçamento de recursos através da especificação deles como URLs. Além disso, também utiliza o protocolo HTTP, já largamente utilizado na web.
+O ciclo de requisição "fazer uma requisição - receber resposta - exibir resposta", entre servidor e cliente, típico do HTTP, também é aproveitado. Quando fazemos uma requisição HTTP GET, por exemplo, estamos solicitando ao servidor que retorne recurso; enquanto que com POST, solicitamos pela criação de um novo recurso.
+Ademais, essa arquitetura tenta preservar a idempotência. Algumas operações mesmo quando executadas repetidamente não causam mudanças de estado.
