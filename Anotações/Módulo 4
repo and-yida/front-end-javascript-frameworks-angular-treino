@@ -91,3 +91,74 @@ Quatro princípios principais:
 REST se apoia em uma característica importante da web que é o endereçamento de recursos através da especificação deles como URLs. Além disso, também utiliza o protocolo HTTP, já largamente utilizado na web.
 O ciclo de requisição "fazer uma requisição - receber resposta - exibir resposta", entre servidor e cliente, típico do HTTP, também é aproveitado. Quando fazemos uma requisição HTTP GET, por exemplo, estamos solicitando ao servidor que retorne recurso; enquanto que com POST, solicitamos pela criação de um novo recurso.
 Ademais, essa arquitetura tenta preservar a idempotência. Algumas operações mesmo quando executadas repetidamente não causam mudanças de estado.
+
+Resources
+Resources é um elemento-chave em REST, e consiste na abstração da informação.
+Um recurso é um mapeamento conceitual de um conjunto de entidades. Qualquer informação que pode ser nomeada pode ser um recurso. E o recurso pode ser identificado especificando um URI.
+
+Verbs
+Os verbos representam ações que podem ser executadas sobre os resources. Os quatro verbos do protocolo HTTPP get, post, put e delete são mapeados em operações CRUD: read, create, update e delete
+
+HTTP GET
+Get é utilizado para requisitar a informação do recurso a ser enviado do servidor ao cliente. A informação pode ser tanto uma coleção de recursos, representado por um URI, ou um recurso específico identificado por seu ID dentro de uma coleção.
+
+HTTP POST, PUT E DELETE
+Post cria um recurso. Essa operação espera receber uma representação do recurso no formato JSON ou XML. O servidor recebe a requisição e cria o recurso no lado do servidor.
+    Ex.:
+    POST http://www.conFusion.food/feedback/
+    Content: {first name, last name, email, comment}
+    //cria um feedback com as propriedades dadas
+Put atualiza um recurso específico. Pode ser especificado somente a modificação em conteúdo específico do recurso ou todo o conteúdo dele.
+    Ex.:
+    PUT http://www.conFusion.food/dishes/123
+    Content: {name, description}
+    //atualiza informação do dish específico
+Delete remove o recurso especificado.
+    Ex.:
+    http://www.conFusion.food/dishes/456
+    //deleta o dish em questão
+
+Stateless server
+O server side não rastreia o estado do client. O cliente deve rastrear suas próprias alterações usando cookies ou client side database. É por isso que utilizamos um setup MVC client-side.
+
+
+ANGULAR HTTP CLIENT
+
+Iniciando o setup do Angular HTTP Client, importamos o module no app.module.ts.
+    import { HttpClientModule } from '@angular/common/http';
+E em imports:
+    HttpClientModule
+Iniciar o servidor no terminal
+    json-server --watch db.json
+
+Uma boa prática é criar um valor especial que aponta para o baseURL do servidor. Criamos um arquivo ts na pasta shared com:
+    export const baseURL = 'http://localhost:3000/';
+Para tornar disponível esse valor para toda a aplicação, incluímos no app.module:
+    import { baseURL } from './shared/baseurl';
+    
+    providers: [
+        ...
+        { provide: 'BaseURL', useValue: baseURL }
+
+Atualizamos o dish.service para receber os dados do servidor. Retiramos a classe dishes cujo arquivo continha os dados dos pratos. No lugar, vamos importar o HttpClient e a baseURL.
+    import { HttpClient } from '@angular/common/http';
+    import { baseURL } from '../menu/shared/baseurl';
+Para buscar a informação, passamos o servidor no construtor.
+      constructor(private http: HttpClient) { }
+
+Os métodos já estavam configurados para retornar ao componente os observables. Modificamos, então, a origem dos dados para corresponder ao servidor. Utilizamos o método HTTP get(), que chama o server side, e fornecemos a URL base + o recurso de interesse.
+    getDishes(): Observable<Dish[]> {
+        return this.http.get<Dish[]>(baseURL + 'dishes');
+Dessa forma, o método get irá buscar a informação em: localhost:3000/dishes
+Atualizamos os demais métodos.
+Importamos a função map, utilizada em outros métodos aqui.
+    import { map } from 'rxjs/operators';
+
+Atualizamos também o componente menu.
+Importamos Inject e utilizamos o decorator @Inject para especificar um provider customizado de uma dependência.
+No construtor:
+  constructor(private dishService: DishService,
+    @Inject('BaseURL') private baseURL : string) { }
+
+Para que o componente exiba a imagem do servidor, fizemos uma pequena alteração no HTML do componente menu. A fonte agora deve conter BaseURL.
+    <img height="200px" src="{{ BaseURL + dish.image }}" alt={{dish.name}}>
